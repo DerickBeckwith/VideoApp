@@ -17,6 +17,13 @@ namespace VideoApp
 
         private readonly Camera camera;
 
+        public CameraPreview(Context context, Camera camera) :
+            base(context)
+        {
+            this.camera = camera;
+            this.Initialize();
+        }
+
         public CameraPreview(Context context, IAttributeSet attrs, Camera camera) :
             base(context, attrs)
         {

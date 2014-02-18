@@ -60,8 +60,11 @@ namespace VideoApp
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f050001
+			public const int btnPreview = 2131034113;
+			
 			// aapt resource value: 0x7f050000
-			public const int btnPreview = 2131034112;
+			public const int camera_preview = 2131034112;
 			
 			static Id()
 			{
