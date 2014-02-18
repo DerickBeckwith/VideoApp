@@ -10,7 +10,7 @@ using Android.OS;
 namespace VideoApp
 {
     [Activity(Label = "VideoApp", MainLauncher = true, Icon = "@drawable/icon")]
-    public class Activity1 : Activity
+    public class MainActivity : Activity
     {
         int count = 1;
 
@@ -23,7 +23,7 @@ namespace VideoApp
 
             // Get our button from the layout resource,
             // and attach an event to it
-            Button button = FindViewById<Button>(Resource.Id.MyButton);
+            Button button = FindViewById<Button>(Resource.Id.btnPreview);
 
             button.Click += delegate { button.Text = string.Format("{0} clicks!", count++); };
         }
