@@ -2,6 +2,7 @@
 
 using Android.App;
 using Android.Content;
+using Android.Hardware;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
@@ -26,6 +27,36 @@ namespace VideoApp
             Button button = FindViewById<Button>(Resource.Id.btnPreview);
 
             button.Click += delegate { button.Text = string.Format("{0} clicks!", count++); };
+        }
+
+        public static Camera GetFrontCamera()
+        {
+            int numberOfCameras = Camera.NumberOfCameras;
+
+            Camera camera = null;
+
+            if (numberOfCameras > 1)
+            {
+                for (int i = 0; i < numberOfCameras; i++)
+                {
+                    var info = new Camera.CameraInfo();
+                    Camera.GetCameraInfo(i, info);
+
+                    if (info.Facing == CameraFacing.Front)
+                    {
+                        try
+                        {
+                            camera = Camera.Open(i);
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+
+            return camera;
         }
     }
 }
