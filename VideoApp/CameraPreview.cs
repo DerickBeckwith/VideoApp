@@ -86,7 +86,7 @@ namespace VideoApp
             catch (Exception exception)
             {
                 Log.Debug(
-                    this.Tag.ToString(), 
+                    this.Tag.ToString(),
                     string.Format("Error starting camera preview: {0}", exception.Message));
             }
         }
@@ -106,7 +106,7 @@ namespace VideoApp
             catch (IOException exception)
             {
                 Log.Debug(
-                    this.Tag.ToString(), 
+                    this.Tag.ToString(),
                     string.Format("Error setting camera preview: {0}", exception.Message));
             }
         }

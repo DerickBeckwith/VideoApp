@@ -1,7 +1,5 @@
 ﻿namespace VideoApp
 {
-    using System;
-
     using Android.App;
     using Android.Hardware;
     using Android.Media;
@@ -10,9 +8,11 @@
     using Android.Widget;
 
     using Java.IO;
+    using Java.Lang;
     using Java.Text;
     using Java.Util;
 
+    using Exception = System.Exception;
     using Uri = Android.Net.Uri;
 
     [Activity(Label = "VideoApp", MainLauncher = true, Icon = "@drawable/icon")]
@@ -21,6 +21,8 @@
         private const int MediaTypeImage = 1;
 
         private const int MediaTypeVideo = 2;
+
+        private const string Tag = "MyCameraApp";
 
         private Camera camera;
 
@@ -131,16 +133,16 @@
             // This location works best if you want the created images to be shared
             // between applications and persist after your app has been uninstalled.
             File mediaStorageDir = new File(
-                Android.OS.Environment.GetExternalStoragePublicDirectory(
-                Android.OS.Environment.DirectoryPictures), 
-                "MyCameraApp");
+                Environment.GetExternalStoragePublicDirectory(
+                Environment.DirectoryPictures),
+                Tag);
 
             // Create the storage directory if it does not exist.
             if (!mediaStorageDir.Exists())
             {
                 if (!mediaStorageDir.Mkdirs())
                 {
-                    Log.Debug("MyCameraApp", "failed to create directory");
+                    Log.Debug(Tag, "failed to create directory");
                     return null;
                 }
             }
@@ -163,6 +165,55 @@
             }
 
             return mediaFile;
+        }
+
+        /// <summary>
+        /// Prepares the media recorder for video recording by
+        /// configuring recorder parameters in the proper order.
+        /// </summary>
+        /// <returns>True if the recorder is prepared for recording,
+        /// False otherwise.</returns>
+        private bool PrepareVideoRecorder()
+        {
+            this.camera = GetFrontCamera();
+            this.mediaRecorder = new MediaRecorder();
+
+            // Step 1: Unlock and set the camera to MediaRecorder.
+            this.camera.Unlock();
+            this.mediaRecorder.SetCamera(this.camera);
+
+            // Step 2: Set sources
+            this.mediaRecorder.SetAudioSource(AudioSource.Camcorder);
+            this.mediaRecorder.SetVideoSource(VideoSource.Camera);
+
+            // Step 3: Set a CamcorderProfile (requires API Level 8 or higher).
+            this.mediaRecorder.SetProfile(CamcorderProfile.Get(CamcorderQuality.High));
+
+            // Step 4: Set output file.
+            this.mediaRecorder.SetOutputFile(GetOutputMediaFile(MediaTypeVideo).ToString());
+
+            // Step 5: Set the preview output.
+            this.mediaRecorder.SetPreviewDisplay(this.cameraPreview.Holder.Surface);
+
+            // Step 6: Prepare configured MediaRecorder.
+            try
+            {
+                this.mediaRecorder.Prepare();
+            }
+            catch (IllegalStateException exception)
+            {
+                Log.Debug(Tag, string.Format("IllegalStateException preparing media recorder: {0}", exception.Message));
+                this.ReleaseMediaRecorder();
+                return false;
+            }
+            catch (IOException exception)
+            {
+                Log.Debug(Tag, string.Format("IOException preparing media recorder: {0}", exception.Message));
+                this.ReleaseMediaRecorder();
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
