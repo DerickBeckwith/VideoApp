@@ -4,7 +4,7 @@
 
     using Android.App;
     using Android.Hardware;
-    using Android.Net;
+    using Android.Media;
     using Android.OS;
     using Android.Util;
     using Android.Widget;
@@ -26,13 +26,15 @@
 
         private CameraPreview cameraPreview;
 
+        private MediaRecorder mediaRecorder;
+
         public static Camera GetDefaultCamera()
         {
             Camera camera = null;
 
             try
             {
-                camera = Camera.Open(0);
+                camera = Camera.Open();
             }
             catch (Exception)
             {
@@ -101,6 +103,10 @@
         {
             base.OnPause();
 
+            // Release the media recorder.
+            this.ReleaseMediaRecorder();
+
+            // Release the camera.
             this.ReleaseCamera();
         }
 
@@ -159,12 +165,35 @@
             return mediaFile;
         }
 
+        /// <summary>
+        /// Release the camera for other applications.
+        /// </summary>
         private void ReleaseCamera()
         {
             if (this.camera != null)
             {
                 this.camera.Release();
                 this.camera = null;
+            }
+        }
+
+        /// <summary>
+        /// Releases resources used by the media recorder.
+        /// </summary>
+        private void ReleaseMediaRecorder()
+        {
+            if (this.mediaRecorder != null)
+            {
+                // Clear recorder configuration.
+                this.mediaRecorder.Reset();
+
+                // Release the recorder object.
+                this.mediaRecorder.Release();
+
+                this.mediaRecorder = null;
+
+                // Lock the camera for later use.
+                this.camera.Lock();
             }
         }
     }
