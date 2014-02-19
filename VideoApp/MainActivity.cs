@@ -13,7 +13,6 @@
     using Java.Util;
 
     using Exception = System.Exception;
-    using Uri = Android.Net.Uri;
 
     [Activity(Label = "VideoApp", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
@@ -22,7 +21,7 @@
 
         private const int MediaTypeVideo = 2;
 
-        private const string Tag = "MyCameraApp";
+        private const string MyAppName = "MyCameraApp";
 
         private Camera camera;
 
@@ -109,6 +108,8 @@
                 {
                     if (this.isRecording)
                     {
+                        this.isRecording = false;
+
                         // Stop the recording.
                         this.mediaRecorder.Stop();
 
@@ -119,27 +120,27 @@
                         this.camera.Lock();
 
                         // Inform the user that recording has stopped.
-                        button.SetText("Capture", TextView.BufferType.Normal);
-                        this.isRecording = false;
+                        button.SetText("Record", TextView.BufferType.Normal);
                     }
                     else
                     {
                         // Initialize the video camera.
                         if (this.PrepareVideoRecorder())
                         {
+                            // Inform the user that recording has started.
+                            //button.SetText("Stop", TextView.BufferType.Normal);
+
                             // Camera is available and unlocked and media recorder is prepared.
                             // At this point you can start recording video.
                             this.mediaRecorder.Start();
 
-                            // Inform the user that recording has started.
-                            button.SetText("Stop", TextView.BufferType.Normal);
                             this.isRecording = true;
                         }
                         else
                         {
                             // Prepare did not work, so release the camera.
                             this.ReleaseMediaRecorder();
-                            Log.Debug(Tag, "Prepare failed when clicking capture button.");
+                            Log.Debug(MyAppName, "Prepare failed when clicking capture button.");
                         }
                     }
                 };
@@ -157,16 +158,6 @@
         }
 
         /// <summary>
-        /// Creates a file Uri for saving an image or video.
-        /// </summary>
-        /// <param name="type">The media file type.</param>
-        /// <returns>An instance of Uri for saving a media file to.</returns>
-        private static Uri GetOutputMediaFileUri(int type)
-        {
-            return Uri.FromFile(GetOutputMediaFile(type));
-        }
-
-        /// <summary>
         /// Creates a File for saving an image or video.
         /// </summary>
         /// <param name="type">The media file type to be created.</param>
@@ -179,14 +170,14 @@
             File mediaStorageDir = new File(
                 Environment.GetExternalStoragePublicDirectory(
                 Environment.DirectoryPictures),
-                Tag);
+                MyAppName);
 
             // Create the storage directory if it does not exist.
             if (!mediaStorageDir.Exists())
             {
                 if (!mediaStorageDir.Mkdirs())
                 {
-                    Log.Debug(Tag, "failed to create directory");
+                    Log.Debug(MyAppName, "failed to create directory");
                     return null;
                 }
             }
@@ -231,7 +222,13 @@
             this.mediaRecorder.SetVideoSource(VideoSource.Camera);
 
             // Step 3: Set a CamcorderProfile (requires API Level 8 or higher).
-            this.mediaRecorder.SetProfile(CamcorderProfile.Get(CamcorderQuality.High));
+            //this.mediaRecorder.SetProfile(CamcorderProfile.Get(CamcorderQuality.High));
+
+            // When using the front facing camera we have to explicity set the output and encoding 
+            // formats otherwise the start method of the media recorder throws an exception.
+            this.mediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
+            this.mediaRecorder.SetAudioEncoder(AudioEncoder.Default);
+            this.mediaRecorder.SetVideoEncoder(VideoEncoder.Default);
 
             // Step 4: Set output file.
             this.mediaRecorder.SetOutputFile(GetOutputMediaFile(MediaTypeVideo).ToString());
@@ -246,13 +243,13 @@
             }
             catch (IllegalStateException exception)
             {
-                Log.Debug(Tag, string.Format("IllegalStateException preparing media recorder: {0}", exception.Message));
+                Log.Debug(MyAppName, string.Format("IllegalStateException preparing media recorder: {0}", exception.Message));
                 this.ReleaseMediaRecorder();
                 return false;
             }
             catch (IOException exception)
             {
-                Log.Debug(Tag, string.Format("IOException preparing media recorder: {0}", exception.Message));
+                Log.Debug(MyAppName, string.Format("IOException preparing media recorder: {0}", exception.Message));
                 this.ReleaseMediaRecorder();
                 return false;
             }
