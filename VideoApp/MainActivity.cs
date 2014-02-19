@@ -17,6 +17,22 @@ namespace VideoApp
 
         private CameraPreview cameraPreview;
 
+        public static Camera GetDefaultCamera()
+        {
+            Camera camera = null;
+
+            try
+            {
+                camera = Camera.Open(0);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return camera;
+        }
+
         public static Camera GetFrontCamera()
         {
             int numberOfCameras = Camera.NumberOfCameras;
