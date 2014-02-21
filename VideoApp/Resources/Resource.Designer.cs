@@ -61,10 +61,13 @@ namespace VideoApp
 		{
 			
 			// aapt resource value: 0x7f050001
-			public const int btnCapture = 2131034113;
+			public const int buttonCapture = 2131034113;
+			
+			// aapt resource value: 0x7f050002
+			public const int buttonPlay = 2131034114;
 			
 			// aapt resource value: 0x7f050000
-			public const int camera_preview = 2131034112;
+			public const int videoView = 2131034112;
 			
 			static Id()
 			{
@@ -95,11 +98,14 @@ namespace VideoApp
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int ApplicationName = 2130968577;
+			// aapt resource value: 0x7f040002
+			public const int ApplicationName = 2130968578;
 			
 			// aapt resource value: 0x7f040000
-			public const int Hello = 2130968576;
+			public const int Capture = 2130968576;
+			
+			// aapt resource value: 0x7f040001
+			public const int Play = 2130968577;
 			
 			static String()
 			{

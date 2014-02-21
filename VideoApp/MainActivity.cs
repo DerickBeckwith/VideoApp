@@ -3,6 +3,7 @@
     using Android.App;
     using Android.Hardware;
     using Android.Media;
+    using Android.Net;
     using Android.OS;
     using Android.Util;
     using Android.Widget;
@@ -23,9 +24,11 @@
 
         private const string MyAppName = "MyCameraApp";
 
+        private string videoFilePath;
+
         private Camera camera;
 
-        private CameraPreview cameraPreview;
+        private VideoView videoViewer;
 
         private MediaRecorder mediaRecorder;
 
@@ -81,13 +84,12 @@
         {
             base.OnCreate(bundle);
 
-            // Set our view from the "main" layout resource
+            // Set our view from the "main" layout resource.
             this.SetContentView(Resource.Layout.Main);
 
             // Create a Camera instance.
             this.camera = GetFrontCamera();
 
-            // Create the preview view and set it as the content of this activity.
             if (this.camera != null)
             {
                 // Set the recording hint to true.
@@ -95,16 +97,16 @@
                 parameters.SetRecordingHint(true);
                 this.camera.SetParameters(parameters);
 
-                this.cameraPreview = new CameraPreview(this, this.camera);
-                FrameLayout previewLayout = this.FindViewById<FrameLayout>(Resource.Id.camera_preview);
-                previewLayout.AddView(this.cameraPreview);
+                // Set the video view as the camera's preview view.
+                this.videoViewer = this.FindViewById<VideoView>(Resource.Id.videoView);
+                this.camera.SetPreviewDisplay(this.videoViewer.Holder);
             }
 
-            // Get our button from the layout resource,
-            // and attach an event to it
-            Button button = FindViewById<Button>(Resource.Id.btnCapture);
+            // Get the capture button from the layout resource.
+            Button captureButton = this.FindViewById<Button>(Resource.Id.buttonCapture);
 
-            button.Click += delegate
+            // Attach a click event handler to the capture button.
+            captureButton.Click += delegate
                 {
                     if (this.isRecording)
                     {
@@ -118,18 +120,12 @@
                         this.camera.Lock();
 
                         this.isRecording = false;
-
-                        // Inform the user that recording has stopped.
-                        //button.SetText("Record", TextView.BufferType.Normal);
                     }
                     else
                     {
                         // Initialize the video camera.
                         if (this.PrepareVideoRecorder())
                         {
-                            // Inform the user that recording has started.
-                            //button.SetText("Stop", TextView.BufferType.Normal);
-
                             // Camera is available and unlocked and media recorder is prepared.
                             // At this point you can start recording video.
                             this.mediaRecorder.Start();
@@ -142,6 +138,21 @@
                             this.ReleaseMediaRecorder();
                             Log.Debug(MyAppName, "Prepare failed when clicking capture button.");
                         }
+                    }
+                };
+
+            // Get the playback button from the layout resource.
+            Button playbackButton = this.FindViewById<Button>(Resource.Id.buttonPlay);
+
+            // Attach a click event handler to the playback button.
+            playbackButton.Click += delegate
+                {
+                    if (!string.IsNullOrEmpty(this.videoFilePath))
+                    {
+                        Uri video = Uri.Parse(this.videoFilePath);
+
+                        this.videoViewer.SetVideoURI(video);
+                        this.videoViewer.Start();
                     }
                 };
         }
@@ -210,7 +221,6 @@
         /// False otherwise.</returns>
         private bool PrepareVideoRecorder()
         {
-            //this.camera = GetFrontCamera();
             this.mediaRecorder = new MediaRecorder();
 
             // Step 1: Unlock and set the camera to MediaRecorder.
@@ -231,10 +241,11 @@
             this.mediaRecorder.SetVideoEncoder(VideoEncoder.Default);
 
             // Step 4: Set output file.
-            this.mediaRecorder.SetOutputFile(GetOutputMediaFile(MediaTypeVideo).ToString());
+            this.videoFilePath = GetOutputMediaFile(MediaTypeVideo).ToString();
+            this.mediaRecorder.SetOutputFile(this.videoFilePath);
 
             // Step 5: Set the preview output.
-            this.mediaRecorder.SetPreviewDisplay(this.cameraPreview.Holder.Surface);
+            this.mediaRecorder.SetPreviewDisplay(this.videoViewer.Holder.Surface);
 
             // Step 6: Prepare configured MediaRecorder.
             try
