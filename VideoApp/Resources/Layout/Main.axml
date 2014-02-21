@@ -3,15 +3,20 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <FrameLayout
-        android:id="@+id/camera_preview"
+    <VideoView
+        android:id="@+id/videoView"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1" />
+        android:layout_height="fill_parent" />
     <Button
-        android:id="@+id/btnCapture"
+        android:id="@+id/buttonCapture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/Hello" />
+        android:text="@string/Capture" />
+    <Button
+        android:id="@+id/buttonPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/Play" />
 </LinearLayout>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="Hello">Record</string>
-    <string name="ApplicationName">VideoApp</string>
+  <string name="Capture">Record</string>
+  <string name="Play">Play</string>
+  <string name="ApplicationName">VideoApp</string>
 </resources>
