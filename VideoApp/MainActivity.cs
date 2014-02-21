@@ -108,8 +108,6 @@
                 {
                     if (this.isRecording)
                     {
-                        this.isRecording = false;
-
                         // Stop the recording.
                         this.mediaRecorder.Stop();
 
@@ -119,8 +117,10 @@
                         // Take camera access back from media recorder.
                         this.camera.Lock();
 
+                        this.isRecording = false;
+
                         // Inform the user that recording has stopped.
-                        button.SetText("Record", TextView.BufferType.Normal);
+                        //button.SetText("Record", TextView.BufferType.Normal);
                     }
                     else
                     {
